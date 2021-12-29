@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, useMemo } from "react";
-import { RecipeContent } from "../pages/api/types";
+import { RecipeContent } from "../types";
 
 export default function useRecipes() {
   const [data, setData] = useState([]);
