@@ -1,27 +1,23 @@
-// @ts-expect-error no types
-import { v4 as uuidv4 } from "uuid";
 import { Request, Response } from "express";
-import { addRecipe } from "./load";
+import { deleteRecipe } from "./load";
 
 // eslint-disable-next-line import/no-anonymous-default-export
 export default async (req: Request, res: Response) => {
-  if (!req.body) {
-    return res.status(400).send("recipe content required.");
+  if (!req.query.recipe || typeof req.query.recipe !== "string") {
+    return res.status(400).send("recipe id required for deleting.");
   }
-  const recipe = JSON.parse(req.body);
-  const newRecipe = { ...recipe, id: uuidv4() };
-  addRecipe(newRecipe);
+  const recipeId = encodeURI(req.query.recipe);
 
-  return Promise.resolve(newRecipe).then((data) => {
+  deleteRecipe(recipeId);
+
+  return Promise.resolve(recipeId).then((data) => {
     let result = JSON.stringify(data);
     return res.status(200).json(result);
   });
 
-  //   let todo = encodeURI(req.query.todo);
-
   //   const token = "REPLACE_YOUR_TOKEN";
   //   const url =
-  //     "https://REPLACE_YOUR_ENDPOINT/lpush/todo/" + todo + "?_token=" + token;
+  //     "https://REPLACE_YOUR_ENDPOINT/lrem/todo/1/" + todo + "?_token=" + token;
 
   //   return fetch(url)
   //     .then((r) => r.json())

@@ -2,7 +2,11 @@ import { useState } from "react";
 import { Card, Button, Input, ErrorMessage } from "../components/Common";
 import { RecipeContent } from "../types";
 
-const AddRecipe = ({ add }: { add: (recipe: RecipeContent) => void }) => {
+const AddRecipe = ({
+  addRecipe,
+}: {
+  addRecipe: (recipe: RecipeContent) => void;
+}) => {
   const [inputs, setInputs] = useState<Partial<RecipeContent>>({});
   const [error, setError] = useState<Error | null>(null);
 
@@ -14,7 +18,7 @@ const AddRecipe = ({ add }: { add: (recipe: RecipeContent) => void }) => {
   const onSubmit: React.MouseEventHandler<HTMLButtonElement> = (event) => {
     event.preventDefault();
     if (inputs.name && inputs.url) {
-      add(inputs as RecipeContent);
+      addRecipe(inputs as RecipeContent);
       setInputs({});
       setError(null);
     } else {

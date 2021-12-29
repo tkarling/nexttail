@@ -12,14 +12,16 @@ export const Card: React.FC = ({ children }) => (
   <div className="p-8 mb-4 rounded shadow text-xl flex">{children}</div>
 );
 
-export const Button: React.FC<ButtonHTMLAttributes<HTMLButtonElement>> = ({
-  children,
-  ...props
-}) => (
-  <button className="bg-indigo-500 text-white p-2 rounded" {...props}>
-    {children}
-  </button>
-);
+export const Button: React.FC<
+  ButtonHTMLAttributes<HTMLButtonElement> & { isDelete?: boolean }
+> = ({ children, isDelete, ...props }) => {
+  const bgColor = !!isDelete ? "bg-red-500" : "bg-indigo-500";
+  return (
+    <button className={`${bgColor} text-white p-2 rounded`} {...props}>
+      {children}
+    </button>
+  );
+};
 
 export const Input: React.FC<InputHTMLAttributes<HTMLInputElement>> = ({
   children,

@@ -20,6 +20,10 @@ export const addRecipe = (newRecipe: Recipe) => {
   ];
 };
 
+export const deleteRecipe = (recipeId: string) => {
+  myRecipes = myRecipes.filter((recipe) => recipe.id !== recipeId);
+};
+
 const sortRecipes = (recipes: Recipe[]) =>
   recipes.sort((a, b) => (a.name < b.name ? -1 : 1));
 
@@ -30,6 +34,7 @@ export default async (req: any, res: any) => {
     return res.status(200).json(result);
   });
 
+  // from https://github.com/upstash/redis-examples/tree/master/nextjs-todo
   // const token = "REPLACE_YOUR_TOKEN";
   // const url = "https://REPLACE_YOUR_ENDPOINT/lrange/todo/0/100?_token=" + token;
   // return fetch(url)

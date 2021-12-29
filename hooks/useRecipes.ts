@@ -20,7 +20,7 @@ export default function useRecipes() {
   }, [load]);
 
   return useMemo(() => {
-    const add = (recipe: RecipeContent) => {
+    const addRecipe = (recipe: RecipeContent) => {
       setIsLoading(true);
       fetch("/api/add", {
         method: "post",
@@ -32,9 +32,9 @@ export default function useRecipes() {
         });
     };
 
-    const remove = (recipe: { id: string }) => {
+    const deleteRecipe = (recipe: { id: string }) => {
       setIsLoading(true);
-      fetch("/api/remove?recipe=" + recipe.id)
+      fetch("/api/delete?recipe=" + recipe.id)
         .then((res) => res.json())
         .then((data) => {
           load();
@@ -43,8 +43,8 @@ export default function useRecipes() {
     return {
       data,
       isLoading,
-      add,
-      remove,
+      addRecipe,
+      deleteRecipe,
     };
   }, [data, isLoading, load]);
 }
