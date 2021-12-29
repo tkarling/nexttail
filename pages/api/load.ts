@@ -1,9 +1,9 @@
 import { Recipe } from "./types";
 
-const myRecipies: Recipe[] = [
+export let myRecipes: Recipe[] = [
   {
     id: "1",
-    name: "Instant Pot Oatmeal Recipe for Steel Cut Oats or Rolled Oats",
+    name: "instant pot oatmeal",
     url: "https://www.foodiecrush.com/instant-pot-oatmeal-recipe-steel-cut-oats-rolled-oats/",
   },
   {
@@ -13,11 +13,23 @@ const myRecipies: Recipe[] = [
   },
 ];
 
+export const addRecipe = (newRecipe: Recipe) => {
+  myRecipes = [
+    ...myRecipes,
+    { ...newRecipe, name: newRecipe.name.toLowerCase() },
+  ];
+};
+
+const sortRecipes = (recipes: Recipe[]) =>
+  recipes.sort((a, b) => (a.name < b.name ? -1 : 1));
+
+// eslint-disable-next-line import/no-anonymous-default-export
 export default async (req: any, res: any) => {
-  return Promise.resolve(myRecipies).then((data) => {
+  return Promise.resolve(sortRecipes(myRecipes)).then((data) => {
     let result = JSON.stringify(data);
     return res.status(200).json(result);
   });
+
   // const token = "REPLACE_YOUR_TOKEN";
   // const url = "https://REPLACE_YOUR_ENDPOINT/lrange/todo/0/100?_token=" + token;
   // return fetch(url)

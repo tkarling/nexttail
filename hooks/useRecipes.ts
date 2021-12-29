@@ -1,58 +1,50 @@
-import { useEffect, useState } from "react";
-import { RecipeContent, Recipe } from "../pages/api/types";
-
-// interface RecipeContent {
-//     name: string;
-//     url: string;
-// }
-
-// interface Recipe extends RecipeContent{
-//     id: string;
-//   }
+import { useEffect, useState, useCallback, useMemo } from "react";
+import { RecipeContent } from "../pages/api/types";
 
 export default function useRecipes() {
   const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [todo, setTodo] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  //   let add = (recipe: RecipeContent) => {
-  //     setLoading(true);
-  //     fetch("/api/add?recipe=" + recipe.name)
-  //       .then((res) => res.json())
-  //       .then((data) => {
-  //         load();
-  //       });
-  //   };
-
-  //   let remove = (recipe: Recipe) => {
-  //     setLoading(true);
-  //     fetch("/api/remove?recipe=" + recipe.id)
-  //       .then((res) => res.json())
-  //       .then((data) => {
-  //         load();
-  //       });
-  //   };
-
-  let load = () => {
-    console.log("load todos");
+  const load = useCallback(() => {
     fetch("/api/load")
       .then((res) => res.json())
       .then((data) => {
         setData(data);
-        setLoading(false);
+        setIsLoading(false);
       });
-  };
-
-  useEffect(() => {
-    console.log("effect");
-    setLoading(true);
-    load();
   }, []);
 
-  return {
-    data,
-    loading,
-    // add,
-    // remove,
-  };
+  useEffect(() => {
+    setIsLoading(true);
+    load();
+  }, [load]);
+
+  return useMemo(() => {
+    const add = (recipe: RecipeContent) => {
+      setIsLoading(true);
+      fetch("/api/add", {
+        method: "post",
+        body: JSON.stringify(recipe),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          load();
+        });
+    };
+
+    const remove = (recipe: { id: string }) => {
+      setIsLoading(true);
+      fetch("/api/remove?recipe=" + recipe.id)
+        .then((res) => res.json())
+        .then((data) => {
+          load();
+        });
+    };
+    return {
+      data,
+      isLoading,
+      add,
+      remove,
+    };
+  }, [data, isLoading, load]);
 }

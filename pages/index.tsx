@@ -1,8 +1,8 @@
-import type { NextPage } from 'next'
-import Link from 'next/link'
+import type { NextPage } from "next";
+import Link from "next/link";
 
-import Head from 'next/head'
-import Image from 'next/image'
+import Head from "next/head";
+import Image from "next/image";
 // import styles from '../styles/Home.module.css'
 
 const Home: NextPage = () => {
@@ -14,12 +14,13 @@ const Home: NextPage = () => {
         </Link>
       </li>
       <li>
-        <Link href="/recipies">
-          <a>Recipies</a>
+        <Link href="/recipes">
+          <a>Recipes</a>
         </Link>
       </li>
     </ul>
-  )}
+  );
+};
 
 // const Home: NextPage = () => {
 //   return (
@@ -87,4 +88,4 @@ const Home: NextPage = () => {
 //   )
 // }
 
-export default Home
+export default Home;
