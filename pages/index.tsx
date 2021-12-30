@@ -18,6 +18,16 @@ const Home: NextPage = () => {
           <a>Recipes</a>
         </Link>
       </li>
+      <li>
+        <Link href="/protected">
+          <a>Protected</a>
+        </Link>
+      </li>
+      <li>
+        <Link href="/profile">
+          <a>Profile</a>
+        </Link>
+      </li>
     </ul>
   );
 };

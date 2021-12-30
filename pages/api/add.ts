@@ -1,10 +1,10 @@
 // @ts-expect-error no types
 import { v4 as uuidv4 } from "uuid";
-import { Request, Response } from "express";
+import type { NextApiRequest, NextApiResponse } from "next";
 import { addRecipe } from "./load";
 
 // eslint-disable-next-line import/no-anonymous-default-export
-export default async (req: Request, res: Response) => {
+export default async (req: NextApiRequest, res: NextApiResponse) => {
   if (!req.body) {
     return res.status(400).send("recipe content required.");
   }

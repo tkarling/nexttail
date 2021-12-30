@@ -1,8 +1,8 @@
-import { Request, Response } from "express";
+import type { NextApiRequest, NextApiResponse } from "next";
 import { deleteRecipe } from "./load";
 
 // eslint-disable-next-line import/no-anonymous-default-export
-export default async (req: Request, res: Response) => {
+export default async (req: NextApiRequest, res: NextApiResponse) => {
   if (!req.query.recipe || typeof req.query.recipe !== "string") {
     return res.status(400).send("recipe id required for deleting.");
   }
