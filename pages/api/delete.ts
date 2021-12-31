@@ -10,9 +10,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
   deleteRecipe(recipeId);
 
-  return Promise.resolve(recipeId).then((data) => {
-    let result = JSON.stringify(data);
-    return res.status(200).json(result);
+  return Promise.resolve().then(() => {
+    return res.status(200).json({});
   });
 
   //   const token = "REPLACE_YOUR_TOKEN";

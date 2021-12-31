@@ -6,7 +6,7 @@ export default function useRecipes() {
   const [isLoading, setIsLoading] = useState(false);
 
   const load = useCallback(() => {
-    fetch("/api/load")
+    fetch("/api/recipe")
       .then((res) => res.json())
       .then((data) => {
         setData(data);
@@ -22,22 +22,30 @@ export default function useRecipes() {
   return useMemo(() => {
     const addRecipe = (recipe: RecipeContent) => {
       setIsLoading(true);
-      fetch("/api/add", {
+      fetch("/api/recipe", {
         method: "post",
         body: JSON.stringify(recipe),
       })
         .then((res) => res.json())
         .then((data) => {
           load();
+        })
+        .catch((error) => {
+          console.log("Error adding recipe", recipe.name, error);
+          setIsLoading(false);
         });
     };
 
-    const deleteRecipe = (recipe: { id: string }) => {
+    const deleteRecipe = ({ id }: { id: string }) => {
       setIsLoading(true);
-      fetch("/api/delete?recipe=" + recipe.id)
+      return fetch("/api/recipe?id=" + id, { method: "delete" })
         .then((res) => res.json())
         .then((data) => {
           load();
+        })
+        .catch((error) => {
+          console.log("Error deleting recipe", id, error);
+          setIsLoading(false);
         });
     };
     return {

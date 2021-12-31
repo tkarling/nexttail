@@ -1,4 +1,4 @@
-import type { Request } from "express";
+import type { NextApiRequest } from "next";
 import { withSSRContext } from "aws-amplify";
 
 export default function Protected({
@@ -14,7 +14,7 @@ export default function Protected({
   return <h1>Hello {username}</h1>;
 }
 
-export const getServerSideProps = async ({ req }: { req: Request }) => {
+export const getServerSideProps = async ({ req }: { req: NextApiRequest }) => {
   const { Auth } = withSSRContext({ req });
   try {
     const user = await Auth.currentAuthenticatedUser();
