@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 
 import { Recipe } from "../../types";
 
-export let myRecipes: Recipe[] = [
+let myRecipes: Recipe[] = [
   {
     id: "1",
     name: "instant pot oatmeal",
@@ -17,6 +17,8 @@ export let myRecipes: Recipe[] = [
     url: "https://www.allrecipes.com/recipe/85389/gourmet-mushroom-risotto/",
   },
 ];
+
+export const loadRecipes = () => myRecipes;
 
 const addRecipe = (newRecipe: Recipe) => {
   myRecipes = [

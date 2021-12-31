@@ -13,6 +13,7 @@ const AddRecipe = ({
   const onChange: React.ChangeEventHandler<HTMLInputElement> = (event) => {
     const { value, name } = event.target;
     setInputs((prev) => ({ ...prev, [name]: value }));
+    setError(null);
   };
 
   const onSubmit: React.MouseEventHandler<HTMLButtonElement> = (event) => {
