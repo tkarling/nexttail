@@ -3,7 +3,7 @@ import { Page, PageTitle, Card, Spinner, Button } from "../components/Common";
 import { Recipe, RecipeContent } from "../types/index";
 import { loadRecipes } from "./api/recipe";
 import AddRecipe from "../components/AddRecipe";
-import useRecipes from "../hooks/useRecipes";
+import useRecipes from "../hooks/useRecipesMock";
 
 interface Props {
   recipes: Recipe[];
