@@ -10,11 +10,13 @@ let myRecipes: Recipe[] = [
     id: "1",
     name: "instant pot oatmeal",
     url: "https://www.foodiecrush.com/instant-pot-oatmeal-recipe-steel-cut-oats-rolled-oats/",
+    _version: 1,
   },
   {
     id: "2",
     name: "Gourmet Mushroom Risotto",
     url: "https://www.allrecipes.com/recipe/85389/gourmet-mushroom-risotto/",
+    _version: 1,
   },
 ];
 
@@ -49,7 +51,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       res.status(400).send("recipe content required");
     }
     const recipe = JSON.parse(req.body);
-    const newRecipe = { ...recipe, id: uuidv4() };
+    const newRecipe = { ...recipe, id: uuidv4(), _version: 1 };
     addRecipe(newRecipe);
 
     return Promise.resolve(newRecipe).then((data) => {
@@ -64,12 +66,12 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   if (req.method === "DELETE") {
-    if (!req.query.id || typeof req.query.id !== "string") {
-      return res.status(400).send("recipe id required for deleting");
+    if (!req.body) {
+      res.status(400).send("recipe to be deleted required");
     }
-    const recipeId = encodeURI(req.query.id);
+    const recipe = JSON.parse(req.body);
 
-    deleteRecipe(recipeId);
+    deleteRecipe(recipe.id);
 
     return Promise.resolve().then(() => {
       return res.status(200).json({});

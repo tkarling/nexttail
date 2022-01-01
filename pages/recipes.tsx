@@ -1,9 +1,11 @@
 import { Authenticator } from "@aws-amplify/ui-react";
 import { Page, PageTitle, Card, Spinner, Button } from "../components/Common";
 import { Recipe, RecipeContent } from "../types/index";
-import { loadRecipes } from "./api/recipe";
+import { loadRecipes as loadMockRecipes } from "./api/recipe";
+import { loadRecipes } from "./api/grecipe";
 import AddRecipe from "../components/AddRecipe";
-import useRecipes from "../hooks/useRecipesMock";
+import useRecipes from "../hooks/useRecipes";
+import { NextApiRequest } from "next";
 
 interface Props {
   recipes: Recipe[];
@@ -29,6 +31,7 @@ const Recipes: React.FC<Props> = ({ recipes: initialRecipes = [] }) => {
     addRecipe,
     deleteRecipe,
   } = useRecipes({ initialRecipes });
+  console.log("🚀 ~ file: recipes.tsx ~ line 29 ~ recipes", recipes);
 
   if (error) {
     return <RecipePage>Error: {error}</RecipePage>;
@@ -72,14 +75,17 @@ const Recipes: React.FC<Props> = ({ recipes: initialRecipes = [] }) => {
   );
 };
 
-export const getServerSideProps = async () => {
-  const { data: recipes } = await Promise.resolve({ data: loadRecipes() });
+export const getServerSideProps = async ({ req }: { req: NextApiRequest }) => {
+  const { recipes } = await Promise.resolve({ recipes: loadMockRecipes() });
+  return { props: { recipes } };
 
-  return {
-    props: {
-      recipes,
-    },
-  };
+  // try {
+  //   const { recipes = [] } = await loadRecipes({ req });
+  //   return { props: { recipes } };
+  // } catch (error) {
+  //   console.log("Error loading recipes", error);
+  //   return { props: {} };
+  // }
 };
 
 export default Recipes;

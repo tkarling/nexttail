@@ -5,4 +5,5 @@ export interface RecipeContent {
 
 export interface Recipe extends RecipeContent {
   id: string;
+  _version: number;
 }

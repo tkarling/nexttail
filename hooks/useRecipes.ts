@@ -1,6 +1,8 @@
 import { useState, useCallback, useMemo } from "react";
 import { Recipe, RecipeContent } from "../types";
 
+const END_POINT = "api/recipe";
+
 export default function useRecipes({
   initialRecipes,
 }: {
@@ -11,7 +13,7 @@ export default function useRecipes({
   const [error, setError] = useState<string | undefined>(undefined);
 
   const load = useCallback(() => {
-    fetch("/api/recipe")
+    fetch(END_POINT)
       .then((res) => res.json())
       .then((data) => {
         setData(data);
@@ -26,11 +28,11 @@ export default function useRecipes({
   return useMemo(() => {
     const addRecipe = (recipe: RecipeContent) => {
       setIsLoading(true);
-      fetch("/api/recipe", {
+      fetch(END_POINT, {
         method: "post",
         body: JSON.stringify(recipe),
       })
-        .then((res) => res.json())
+        // .then((res) => res.json())
         .then((data) => {
           load();
         })
@@ -41,18 +43,23 @@ export default function useRecipes({
         });
     };
 
-    const deleteRecipe = ({ id }: { id: string }) => {
+    const deleteRecipe = (recipe: Recipe) => {
       setIsLoading(true);
-      return fetch("/api/recipe?id=" + id, { method: "delete" })
-        .then((res) => res.json())
-        .then((data) => {
-          load();
+      return (
+        fetch(END_POINT, {
+          method: "delete",
+          body: JSON.stringify(recipe),
         })
-        .catch((error) => {
-          console.log("Error deleting recipe", id, error);
-          setError(`Error deleting Recipe: ${error}`);
-          setIsLoading(false);
-        });
+          // .then((res) => res.json())
+          .then((data) => {
+            load();
+          })
+          .catch((error) => {
+            console.log("Error deleting recipe", recipe.id, error);
+            setError(`Error deleting Recipe: ${error}`);
+            setIsLoading(false);
+          })
+      );
     };
     return {
       data,

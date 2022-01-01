@@ -1,22 +1,14 @@
 // pages/index.js
 import type { NextApiRequest, NextApiResponse } from "next";
-// import { Authenticator } from "@aws-amplify/ui-react";
-import { Amplify, API, Auth, withSSRContext } from "aws-amplify";
-// import Head from "next/head";
-// import awsExports from "../src/aws-exports";
-// import { createRecipeNT } from "../src/graphql/mutations";
-import { listRecipeNTS } from "../src/graphql/queries";
-// import styles from "../styles/Home.module.css";
-
+import { API, withSSRContext } from "aws-amplify";
 import { Authenticator } from "@aws-amplify/ui-react";
-import { Page, PageTitle, Card, Spinner, Button } from "../components/Common";
-import { Recipe, RecipeContent } from "../types/index";
-import { loadRecipes } from "./api/recipe";
-import AddRecipe from "../components/AddRecipe";
-import useRecipes from "../hooks/useRecipesMock";
+
+import { listRecipeNTS } from "../src/graphql/queries";
 import { createRecipeNT, deleteRecipeNT } from "../src/graphql/mutations";
 
-// Amplify.configure({ ...awsExports, ssr: true });
+import { Page, PageTitle, Card, Spinner, Button } from "../components/Common";
+import { Recipe, RecipeContent } from "../types/index";
+import AddRecipe from "../components/AddRecipe";
 
 export async function getServerSideProps({ req }: { req: NextApiRequest }) {
   let recipes = [];
@@ -26,12 +18,12 @@ export async function getServerSideProps({ req }: { req: NextApiRequest }) {
     recipes = response.data.listRecipeNTS.items
       .filter((item: any) => !item._deleted)
       .map((item: any) => {
-        const { id, name, url } = item;
-        return { id, name, url };
+        const { id, name, url, _version } = item;
+        return { id, name, url, _version };
       });
     console.log(
-      "🚀 ~ file: grecipes.tsx ~ line 16 ~ getServerSideProps ~ response",
-      response
+      "🚀 ~ file: grecipes.tsx ~ line 16 ~ getServerSideProps ~ recipes",
+      recipes
     );
   } catch (error) {
     console.log(
@@ -48,10 +40,6 @@ export async function getServerSideProps({ req }: { req: NextApiRequest }) {
 }
 
 async function addRecipe(recipeContent: RecipeContent) {
-  //   event.preventDefault();
-
-  //   const form = new FormData(event.target);
-
   try {
     const { data } = await API.graphql({
       authMode: "AMAZON_COGNITO_USER_POOLS",
@@ -59,13 +47,11 @@ async function addRecipe(recipeContent: RecipeContent) {
       variables: {
         input: {
           ...recipeContent,
-          //   title: form.get("title"),
-          //   content: form.get("content"),
         },
       },
     });
 
-    // window.location.href = `/posts/${data.createPost.id}`;
+    window.location.href = `/grecipes`;
   } catch ({ errors }) {
     console.error(errors);
     // throw new Error(errors[0].message);
@@ -73,10 +59,6 @@ async function addRecipe(recipeContent: RecipeContent) {
 }
 
 async function deleteRecipe(recipe: Recipe) {
-  //   event.preventDefault();
-
-  //   const form = new FormData(event.target);
-
   try {
     const { data } = await API.graphql({
       authMode: "AMAZON_COGNITO_USER_POOLS",
@@ -84,14 +66,12 @@ async function deleteRecipe(recipe: Recipe) {
       variables: {
         input: {
           id: recipe.id,
-          _version: 1,
-          //   title: form.get("title"),
-          //   content: form.get("content"),
+          _version: recipe._version,
         },
       },
     });
 
-    // window.location.href = `/posts/${data.createPost.id}`;
+    window.location.href = `/grecipes`;
   } catch ({ errors }) {
     console.error(errors);
     // throw new Error(errors[0].message);
