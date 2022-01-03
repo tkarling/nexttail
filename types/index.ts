@@ -1,6 +1,8 @@
 export interface RecipeContent {
   name: string;
   url: string;
+  thisWeek?: boolean;
+  tags?: string;
 }
 
 export interface Recipe extends RecipeContent {

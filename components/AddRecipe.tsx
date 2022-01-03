@@ -38,6 +38,9 @@ const AddRecipe = ({
             <div className="mr-4 mb-2">
               <Input onChange={onChange} name="url" placeholder="url" />
             </div>
+            <div className="mr-4 mb-2">
+              <Input onChange={onChange} name="tags" placeholder="tags" />
+            </div>
           </div>
           <div>
             <Button onClick={onSubmit}>Add</Button>

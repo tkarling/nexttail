@@ -1,5 +1,12 @@
 import { Authenticator } from "@aws-amplify/ui-react";
-import { Page, PageTitle, Card, Spinner, Button } from "../components/Common";
+import {
+  Page,
+  PageTitle,
+  Card,
+  Spinner,
+  Button,
+  Checkbox,
+} from "../components/Common";
 import { Recipe, RecipeContent } from "../types/index";
 import { loadRecipes as loadMockRecipes } from "./api/recipe";
 import { loadRecipes } from "./api/grecipe";
@@ -30,8 +37,8 @@ const Recipes: React.FC<Props> = ({ recipes: initialRecipes = [] }) => {
     error,
     addRecipe,
     deleteRecipe,
+    toggleThisWeek,
   } = useRecipes({ initialRecipes });
-  console.log("🚀 ~ file: recipes.tsx ~ line 29 ~ recipes", recipes);
 
   if (error) {
     return <RecipePage>Error: {error}</RecipePage>;
@@ -49,17 +56,29 @@ const Recipes: React.FC<Props> = ({ recipes: initialRecipes = [] }) => {
       {() => (
         <RecipePage addRecipe={addRecipe}>
           {recipes.map((recipe) => {
-            const { id, name, url } = recipe;
+            const { id, name, url, thisWeek, tags } = recipe;
             return (
               <Card key={id}>
                 <div className="w-full flex justify-between">
-                  <a href={url} target="_blank" rel="noreferrer">
-                    <h2 className="capitalize">{name}</h2>
-                    {/* <p>Find in-depth information about Next.js features and API.</p> */}
-                  </a>
-                  <Button onClick={() => deleteRecipe(recipe)} isDelete>
-                    x
-                  </Button>
+                  <div className="flex-1 flex gap-4 content-center">
+                    <div className="form-check">
+                      <Checkbox
+                        checked={thisWeek}
+                        onChange={() => toggleThisWeek(recipe)}
+                      />
+                    </div>
+                    <div>
+                      <a href={url} target="_blank" rel="noreferrer">
+                        <h2 className="capitalize">{name}</h2>
+                        <div className="text-sm text-indigo-500">{tags}</div>
+                      </a>
+                    </div>
+                  </div>
+                  <div>
+                    <Button onClick={() => deleteRecipe(recipe)} isDelete>
+                      x
+                    </Button>
+                  </div>
                 </div>
               </Card>
             );

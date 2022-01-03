@@ -1,5 +1,9 @@
 import { ButtonHTMLAttributes, InputHTMLAttributes } from "react";
 
+export const color = {
+  PRIMARY: "indigo-500",
+};
+
 export const Page: React.FC = ({ children }) => (
   <div className="w-full max-w-3xl mx-auto my-16 px-2">{children}</div>
 );
@@ -15,7 +19,7 @@ export const Card: React.FC = ({ children }) => (
 export const Button: React.FC<
   ButtonHTMLAttributes<HTMLButtonElement> & { isDelete?: boolean }
 > = ({ children, isDelete, ...props }) => {
-  const bgColor = !!isDelete ? "bg-red-500" : "bg-indigo-500";
+  const bgColor = !!isDelete ? "bg-red-500" : `bg-${color.PRIMARY}`;
   return (
     <button className={`${bgColor} text-white p-2 rounded`} {...props}>
       {children}
@@ -27,6 +31,18 @@ export const Input: React.FC<InputHTMLAttributes<HTMLInputElement>> = ({
   children,
   ...props
 }) => <input className="w-full p-2" {...props} />;
+
+export const Checkbox: React.FC<InputHTMLAttributes<HTMLInputElement>> = (
+  props
+) => {
+  return (
+    <input
+      className={`form-check-input appearance-none h-4 w-4 border border-gray-300 rounded-sm bg-white checked:bg-${color.PRIMARY} checked:border-${color.PRIMARY} focus:outline-none transition duration-200 my-1 align-top bg-no-repeat bg-center bg-contain float-left cursor-pointer text-white`}
+      type="checkbox"
+      {...props}
+    />
+  );
+};
 
 export const ErrorMessage: React.FC = ({ children }) => (
   <div className="text-red-500">{children}</div>

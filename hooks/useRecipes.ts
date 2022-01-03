@@ -61,12 +61,37 @@ export default function useRecipes({
           })
       );
     };
+
+    const updateRecipe = (recipe: Recipe) => {
+      setIsLoading(true);
+      return (
+        fetch(END_POINT, {
+          method: "put",
+          body: JSON.stringify(recipe),
+        })
+          // .then((res) => res.json())
+          .then((data) => {
+            load();
+          })
+          .catch((error) => {
+            console.log("Error updating recipe", recipe.id, error);
+            setError(`Error updating Recipe: ${error}`);
+            setIsLoading(false);
+          })
+      );
+    };
+
+    const toggleThisWeek = (recipe: Recipe) => {
+      updateRecipe({ ...recipe, thisWeek: !recipe.thisWeek });
+    };
+
     return {
       data,
       isLoading,
       error,
       addRecipe,
       deleteRecipe,
+      toggleThisWeek,
     };
   }, [data, error, isLoading, load]);
 }

@@ -2,12 +2,24 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { withSSRContext } from "aws-amplify";
 
 import { listRecipeNTS } from "../../src/graphql/queries";
-import { createRecipeNT, deleteRecipeNT } from "../../src/graphql/mutations";
+import {
+  createRecipeNT,
+  deleteRecipeNT,
+  updateRecipeNT,
+} from "../../src/graphql/mutations";
 
 import { Recipe, RecipeContent } from "../../types";
 
 const sortRecipes = (recipes: Recipe[]) =>
-  recipes.sort((a, b) => (a.name < b.name ? -1 : 1));
+  recipes.sort((a, b) => {
+    if (a.thisWeek && !b.thisWeek) {
+      return -1;
+    }
+    if (b.thisWeek && !a.thisWeek) {
+      return 1;
+    }
+    return a.name < b.name ? -1 : 1;
+  });
 
 export const loadRecipes = async ({ req }: { req: NextApiRequest }) => {
   const SSR = withSSRContext({ req });
@@ -16,8 +28,8 @@ export const loadRecipes = async ({ req }: { req: NextApiRequest }) => {
   const _recipes = response.data.listRecipeNTS.items
     .filter((item: any) => !item._deleted)
     .map((item: any) => {
-      const { id, name, url, _version } = item;
-      return { id, name, url, _version };
+      const { id, name, url, thisWeek, tags, _version } = item;
+      return { id, name, url, thisWeek, tags, _version };
     });
   const recipes = sortRecipes(_recipes);
 
@@ -51,6 +63,19 @@ async function deleteRecipe(API: any, recipe: Recipe) {
     },
   });
   return {};
+}
+
+async function updateRecipe(API: any, recipe: Recipe) {
+  const { data: newRecipe } = await API.graphql({
+    authMode: "AMAZON_COGNITO_USER_POOLS",
+    query: updateRecipeNT,
+    variables: {
+      input: {
+        ...recipe,
+      },
+    },
+  });
+  return { recipe };
 }
 
 // eslint-disable-next-line import/no-anonymous-default-export
@@ -96,6 +121,21 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     try {
       const { data } = await deleteRecipe(API, recipe);
       return res.status(200).json({});
+    } catch (error) {
+      console.log("Error deleting recipe", error);
+      res.status(400).send(error);
+    }
+  }
+
+  if (req.method === "PUT") {
+    if (!req.body) {
+      res.status(400).send("recipe to be updated required");
+    }
+
+    const recipe = JSON.parse(req.body);
+    try {
+      updateRecipe(API, recipe);
+      return res.status(200).json(recipe);
     } catch (error) {
       console.log("Error deleting recipe", error);
       res.status(400).send(error);

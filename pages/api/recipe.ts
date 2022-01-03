@@ -11,12 +11,14 @@ let myRecipes: Recipe[] = [
     name: "instant pot oatmeal",
     url: "https://www.foodiecrush.com/instant-pot-oatmeal-recipe-steel-cut-oats-rolled-oats/",
     _version: 1,
+    thisWeek: true,
   },
   {
     id: "2",
     name: "Gourmet Mushroom Risotto",
     url: "https://www.allrecipes.com/recipe/85389/gourmet-mushroom-risotto/",
     _version: 1,
+    tags: "breakfast",
   },
 ];
 
@@ -33,8 +35,22 @@ const deleteRecipe = (recipeId: string) => {
   myRecipes = myRecipes.filter((recipe) => recipe.id !== recipeId);
 };
 
+const updateRecipe = (newRecipe: Recipe) => {
+  myRecipes = myRecipes.map((recipe) =>
+    recipe.id !== newRecipe.id ? recipe : newRecipe
+  );
+};
+
 const sortRecipes = (recipes: Recipe[]) =>
-  recipes.sort((a, b) => (a.name < b.name ? -1 : 1));
+  recipes.sort((a, b) => {
+    if (a.thisWeek && !b.thisWeek) {
+      return -1;
+    }
+    if (b.thisWeek && !a.thisWeek) {
+      return 1;
+    }
+    return a.name < b.name ? -1 : 1;
+  });
 
 // eslint-disable-next-line import/no-anonymous-default-export
 export default async (req: NextApiRequest, res: NextApiResponse) => {
@@ -75,6 +91,19 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
     return Promise.resolve().then(() => {
       return res.status(200).json({});
+    });
+  }
+
+  if (req.method === "PUT") {
+    if (!req.body) {
+      res.status(400).send("recipe to be updated required");
+    }
+    const recipe = JSON.parse(req.body);
+
+    updateRecipe(recipe);
+
+    return Promise.resolve().then(() => {
+      return res.status(200).json(recipe);
     });
   }
 
