@@ -1,7 +1,7 @@
 import { ButtonHTMLAttributes, InputHTMLAttributes } from "react";
 
 export const color = {
-  PRIMARY: "indigo-500",
+  PRIMARY: "blue-500",
 };
 
 export const Page: React.FC = ({ children }) => (
@@ -13,7 +13,7 @@ export const PageTitle: React.FC = ({ children }) => <h1>{children}</h1>;
 export const Spinner: React.FC = () => <div className="p-8">Loading...</div>;
 
 export const Card: React.FC = ({ children }) => (
-  <div className="p-8 mb-4 rounded shadow text-xl flex">{children}</div>
+  <div className="p-4 mb-4 rounded shadow text-xl flex">{children}</div>
 );
 
 export const Button: React.FC<
@@ -21,7 +21,7 @@ export const Button: React.FC<
 > = ({ children, isDelete, ...props }) => {
   const bgColor = !!isDelete ? "bg-red-500" : `bg-${color.PRIMARY}`;
   return (
-    <button className={`${bgColor} text-white p-2 rounded`} {...props}>
+    <button className={`${bgColor} text-white px-2 pb-1 rounded-xl`} {...props}>
       {children}
     </button>
   );

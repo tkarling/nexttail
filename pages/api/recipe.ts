@@ -54,13 +54,13 @@ const sortRecipes = (recipes: Recipe[]) =>
 
 // eslint-disable-next-line import/no-anonymous-default-export
 export default async (req: NextApiRequest, res: NextApiResponse) => {
-  const { Auth } = withSSRContext({ req });
-  try {
-    const user = await Auth.currentAuthenticatedUser();
-  } catch (error) {
-    console.log("Error authenticating:", error);
-    res.status(400).send(error);
-  }
+  // const { Auth } = withSSRContext({ req });
+  // try {
+  //   const user = await Auth.currentAuthenticatedUser();
+  // } catch (error) {
+  //   console.log("Error authenticating:", error);
+  //   res.status(400).send(error);
+  // }
 
   if (req.method === "POST") {
     if (!req.body) {
