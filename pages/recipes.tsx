@@ -1,7 +1,7 @@
 // import { Authenticator } from "@aws-amplify/ui-react";
 import { Page, Card, Spinner, Button } from "../components/Common";
 import { Recipe, RecipeContent } from "../types/index";
-import { loadRecipes as loadMockRecipes } from "./api/recipe";
+import { loadRecipes as loadFsRecipes } from "./api/recipe";
 // import { loadRecipes } from "./api/grecipe";
 import AddRecipe from "../components/AddRecipe";
 import RecipeCard from "../components/RecipeCard";
@@ -75,7 +75,7 @@ const Recipes: React.FC<Props> = ({ recipes: initialRecipes = [] }) => {
 };
 
 export const getServerSideProps = async ({ req }: { req: NextApiRequest }) => {
-  const { recipes } = await Promise.resolve({ recipes: loadMockRecipes() });
+  const recipes = loadFsRecipes();
   return { props: { recipes } };
 
   // try {

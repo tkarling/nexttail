@@ -5,40 +5,72 @@ import { v4 as uuidv4 } from "uuid";
 
 import { Recipe } from "../../types";
 
-let myRecipes: Recipe[] = [
-  {
-    id: "1",
-    name: "instant pot oatmeal",
-    url: "https://www.foodiecrush.com/instant-pot-oatmeal-recipe-steel-cut-oats-rolled-oats/",
-    _version: 1,
-    thisWeek: true,
-  },
-  {
-    id: "2",
-    name: "Gourmet Mushroom Risotto",
-    url: "https://www.allrecipes.com/recipe/85389/gourmet-mushroom-risotto/",
-    _version: 1,
-    tags: "breakfast",
-  },
-];
+const fs = require("fs");
 
-export const loadRecipes = () => myRecipes;
+const FILE_NAME = "demo.json";
+let savedRecipes: Recipe[];
+//  = [
+//   {
+//     id: "1",
+//     name: "instant pot oatmeal",
+//     url: "https://www.foodiecrush.com/instant-pot-oatmeal-recipe-steel-cut-oats-rolled-oats/",
+//     _version: 1,
+//     thisWeek: true,
+//   },
+//   {
+//     id: "2",
+//     name: "Gourmet Mushroom Risotto",
+//     url: "https://www.allrecipes.com/recipe/85389/gourmet-mushroom-risotto/",
+//     _version: 1,
+//     tags: "breakfast",
+//   },
+// ];
+
+const readRecipes = () => {
+  if (savedRecipes) {
+    return savedRecipes;
+  }
+  try {
+    const data = fs.readFileSync(FILE_NAME, { encoding: "utf8", flag: "r" });
+    savedRecipes = data ? JSON.parse(data) : [];
+  } catch (err) {
+    console.log("Error reading recipes", err);
+  }
+  return savedRecipes;
+};
+
+const saveRecipes = (recipes: Recipe[]) => {
+  savedRecipes = recipes;
+  try {
+    fs.writeFileSync(FILE_NAME, JSON.stringify(recipes));
+  } catch (err) {
+    console.log("Error writing recipes", err);
+  }
+};
+
+export const loadRecipes = () => readRecipes();
 
 const addRecipe = (newRecipe: Recipe) => {
-  myRecipes = [
+  const myRecipes = readRecipes();
+  const updatedRecipes = [
     ...myRecipes,
     { ...newRecipe, name: newRecipe.name.toLowerCase() },
   ];
+  saveRecipes(updatedRecipes);
 };
 
 const deleteRecipe = (recipeId: string) => {
-  myRecipes = myRecipes.filter((recipe) => recipe.id !== recipeId);
+  const myRecipes = readRecipes();
+  const updatedRecipes = myRecipes.filter((recipe) => recipe.id !== recipeId);
+  saveRecipes(updatedRecipes);
 };
 
 const updateRecipe = (newRecipe: Recipe) => {
-  myRecipes = myRecipes.map((recipe) =>
+  const myRecipes = readRecipes();
+  const updatedRecipes = myRecipes.map((recipe) =>
     recipe.id !== newRecipe.id ? recipe : newRecipe
   );
+  saveRecipes(updatedRecipes);
 };
 
 const sortRecipes = (recipes: Recipe[]) =>
@@ -76,12 +108,14 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   if (req.method === "GET") {
-    return Promise.resolve(sortRecipes(myRecipes)).then((data) => {
+    return Promise.resolve(sortRecipes(readRecipes())).then((data) => {
       return res.status(200).json(data);
     });
   }
 
   if (req.method === "DELETE") {
+    console.log("🚀 ~ file: recipe.ts ~ line 128 ~ method", req.method);
+
     if (!req.body) {
       res.status(400).send("recipe to be deleted required");
     }

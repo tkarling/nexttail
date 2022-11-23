@@ -1,0 +1,36 @@
+[
+  {
+    "name": "instant pot oatmeal",
+    "url": "https://www.foodiecrush.com/instant-pot-oatmeal-recipe-steel-cut-oats-rolled-oats/",
+    "tags": "breakfast",
+    "id": "0f34da63-c67d-4a03-8116-ef56294ef162",
+    "_version": 1,
+    "thisWeek": true
+  },
+  {
+    "name": "easy pesto pasta",
+    "tags": "dinner",
+    "url": "https://mypantry.vercel.app/recipes",
+    "id": "9e7b6ded-9fac-4292-b678-44a76a9e7847",
+    "_version": 1
+  },
+  {
+    "name": "gourmet mushroom risotto",
+    "url": "https://www.allrecipes.com/recipe/85389/gourmet-mushroom-risotto/",
+    "tags": "dinner",
+    "id": "3b414e5d-5c91-4163-9864-4d95c8c2a950",
+    "_version": 1
+  },
+  {
+    "name": "smashed white bean & spinach quesadillas",
+    "url": "https://sweetpeasandsaffron.com/smashed-white-bean-spinach-quesadillas-freezer-friendly/",
+    "id": "bf45fbb8-81c3-45e6-b147-eb57d8506562",
+    "_version": 1
+  },
+  {
+    "name": "instant pot split pea soup",
+    "url": "https://www.simplyhappyfoodie.com/instant-pot-split-pea-soup/",
+    "id": "b2c75aa4-aa47-4aa7-9182-36bcf8db9f78",
+    "_version": 1
+  }
+]
