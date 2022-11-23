@@ -1,18 +1,13 @@
-import { Authenticator } from "@aws-amplify/ui-react";
-import {
-  Page,
-  PageTitle,
-  Card,
-  Spinner,
-  Button,
-  Checkbox,
-} from "../components/Common";
+// import { Authenticator } from "@aws-amplify/ui-react";
+import { Page, Card, Spinner, Button } from "../components/Common";
 import { Recipe, RecipeContent } from "../types/index";
 import { loadRecipes as loadMockRecipes } from "./api/recipe";
-import { loadRecipes } from "./api/grecipe";
+// import { loadRecipes } from "./api/grecipe";
 import AddRecipe from "../components/AddRecipe";
+import RecipeCard from "../components/RecipeCard";
 import useRecipes from "../hooks/useRecipes";
 import { NextApiRequest } from "next";
+import { useState } from "react";
 
 interface Props {
   recipes: Recipe[];
@@ -20,12 +15,9 @@ interface Props {
 
 const RecipePage: React.FC<{ addRecipe?: (recipe: RecipeContent) => void }> = ({
   children,
-  addRecipe = () => {},
 }) => (
   <Page>
-    <PageTitle>Add Recipe</PageTitle>
-    <AddRecipe addRecipe={addRecipe} />
-    <PageTitle>Recipes</PageTitle>
+    <h1 className="text-xl pb-2">Recipes</h1>
     {children}
   </Page>
 );
@@ -39,6 +31,7 @@ const Recipes: React.FC<Props> = ({ recipes: initialRecipes = [] }) => {
     deleteRecipe,
     toggleThisWeek,
   } = useRecipes({ initialRecipes });
+  const [addOpen, setAddOpen] = useState(false);
 
   if (error) {
     return <RecipePage>Error: {error}</RecipePage>;
@@ -52,45 +45,32 @@ const Recipes: React.FC<Props> = ({ recipes: initialRecipes = [] }) => {
   }
 
   return (
-    <Authenticator>
-      {() => (
-        <RecipePage addRecipe={addRecipe}>
-          {recipes.map((recipe) => {
-            const { id, name, url, thisWeek, tags } = recipe;
-            return (
-              <Card key={id}>
-                <div className="w-full flex justify-between">
-                  <div className="flex-1 flex gap-4 content-center">
-                    <div className="form-check">
-                      <Checkbox
-                        checked={thisWeek}
-                        onChange={() => toggleThisWeek(recipe)}
-                      />
-                    </div>
-                    <div>
-                      <a href={url} target="_blank" rel="noreferrer">
-                        <h2 className="capitalize">{name}</h2>
-                        <div className="text-sm text-indigo-500">{tags}</div>
-                      </a>
-                    </div>
-                  </div>
-                  <div>
-                    <Button onClick={() => deleteRecipe(recipe)} isDelete>
-                      x
-                    </Button>
-                  </div>
-                </div>
-              </Card>
-            );
-          })}
-          {!recipes.length && (
-            <Card>
-              <div>You have no Recipes. Please add a Recipe</div>
-            </Card>
-          )}
-        </RecipePage>
-      )}
-    </Authenticator>
+    <>
+      {/* {() => ( */}
+      <RecipePage>
+        {addOpen ? (
+          <AddRecipe addRecipe={addRecipe} onClose={() => setAddOpen(false)} />
+        ) : (
+          <div className="py-2">
+            <Button onClick={() => setAddOpen(true)}>Add</Button>
+          </div>
+        )}
+        {recipes.map((recipe) => (
+          <RecipeCard
+            key={recipe.id}
+            recipe={recipe}
+            toggleThisWeek={() => toggleThisWeek(recipe)}
+            deleteRecipe={() => deleteRecipe(recipe)}
+          />
+        ))}
+        {!recipes.length && (
+          <Card>
+            <div>You have no Recipes. Please add a Recipe</div>
+          </Card>
+        )}
+      </RecipePage>
+      {/* )} */}
+    </>
   );
 };
 

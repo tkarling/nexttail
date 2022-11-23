@@ -1,7 +1,15 @@
 import { ButtonHTMLAttributes, InputHTMLAttributes } from "react";
 
-export const color = {
-  PRIMARY: "blue-500",
+export const bgColor = {
+  PRIMARY: "bg-sky-500",
+  SECONDARY: "bg-gray-500",
+  DANGER: "bg-red-500",
+};
+
+export const borderColor = {
+  PRIMARY: "border-sky-500",
+  SECONDARY: "border-gray-500",
+  DANGER: "border-red-500",
 };
 
 export const Page: React.FC = ({ children }) => (
@@ -13,15 +21,23 @@ export const PageTitle: React.FC = ({ children }) => <h1>{children}</h1>;
 export const Spinner: React.FC = () => <div className="p-8">Loading...</div>;
 
 export const Card: React.FC = ({ children }) => (
-  <div className="p-4 mb-4 rounded shadow text-xl flex">{children}</div>
+  <div className="p-2 rounded shadow text-xl flex-col">{children}</div>
 );
 
 export const Button: React.FC<
-  ButtonHTMLAttributes<HTMLButtonElement> & { isDelete?: boolean }
-> = ({ children, isDelete, ...props }) => {
-  const bgColor = !!isDelete ? "bg-red-500" : `bg-${color.PRIMARY}`;
+  ButtonHTMLAttributes<HTMLButtonElement> & { color?: string }
+> = ({ children, color, ...props }) => {
+  const myBgColor =
+    color === "danger"
+      ? `${bgColor.DANGER}`
+      : color === "secondary"
+      ? `${bgColor.SECONDARY}`
+      : `${bgColor.PRIMARY}`;
   return (
-    <button className={`${bgColor} text-white px-2 pb-1 rounded-xl`} {...props}>
+    <button
+      className={`${myBgColor} text-white px-2 pb-1 rounded-xl text-base`}
+      {...props}
+    >
       {children}
     </button>
   );
@@ -37,7 +53,7 @@ export const Checkbox: React.FC<InputHTMLAttributes<HTMLInputElement>> = (
 ) => {
   return (
     <input
-      className={`form-check-input appearance-none h-4 w-4 border border-gray-300 rounded-sm bg-white checked:bg-${color.PRIMARY} checked:border-${color.PRIMARY} focus:outline-none transition duration-200 my-1 align-top bg-no-repeat bg-center bg-contain float-left cursor-pointer text-white`}
+      className={`form-check-input appearance-none h-4 w-4 border border-gray-300 rounded-sm bg-white checked:bg-sky-500 checked:border-sky-500 focus:outline-none transition duration-200 my-1 align-top bg-no-repeat bg-center bg-contain float-left cursor-pointer text-white`}
       type="checkbox"
       {...props}
     />
