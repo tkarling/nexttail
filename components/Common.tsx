@@ -13,7 +13,7 @@ export const borderColor = {
 };
 
 export const Page: React.FC = ({ children }) => (
-  <div className="w-full max-w-3xl mx-auto my-16 px-2">{children}</div>
+  <div className="w-full max-w-3xl mx-auto my-6 md:my-16 px-4">{children}</div>
 );
 
 export const PageTitle: React.FC = ({ children }) => <h1>{children}</h1>;
