@@ -4,10 +4,10 @@ import type { User } from "./user";
 import { withIronSessionApiRoute } from "iron-session/next";
 import { sessionOptions } from "../../lib/session";
 import { NextApiRequest, NextApiResponse } from "next";
+import NAMES from "./names.json";
 // const octokit = new Octokit();
 
 export default withIronSessionApiRoute(loginRoute, sessionOptions);
-const NAMES = ["tkarling", "amyllykoski"];
 
 async function loginRoute(req: NextApiRequest, res: NextApiResponse) {
   const { username } = await req.body;

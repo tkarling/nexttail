@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { withSSRContext } from "aws-amplify";
+import { withIronSessionApiRoute } from "iron-session/next";
+import { sessionOptions } from "../../lib/session";
 // @ts-expect-error no types
 import { v4 as uuidv4 } from "uuid";
 
@@ -48,7 +49,7 @@ const saveRecipes = (recipes: Recipe[]) => {
   }
 };
 
-export const loadRecipes = () => readRecipes();
+export const loadRecipes = () => sortRecipes(readRecipes());
 
 const addRecipe = (newRecipe: Recipe) => {
   const myRecipes = readRecipes();
@@ -84,47 +85,13 @@ const sortRecipes = (recipes: Recipe[]) =>
     return a.name < b.name ? -1 : 1;
   });
 
+export default withIronSessionApiRoute(recipeRoute, sessionOptions);
+
 // eslint-disable-next-line import/no-anonymous-default-export
-export default async (req: NextApiRequest, res: NextApiResponse) => {
-  // const { Auth } = withSSRContext({ req });
-  // try {
-  //   const user = await Auth.currentAuthenticatedUser();
-  // } catch (error) {
-  //   console.log("Error authenticating:", error);
-  //   res.status(400).send(error);
-  // }
-
-  if (req.method === "POST") {
-    if (!req.body) {
-      res.status(400).send("recipe content required");
-    }
-    const recipe = JSON.parse(req.body);
-    const newRecipe = { ...recipe, id: uuidv4(), _version: 1 };
-    addRecipe(newRecipe);
-
-    return Promise.resolve(newRecipe).then((data) => {
-      return res.status(200).json(data);
-    });
-  }
-
+async function recipeRoute(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "GET") {
-    return Promise.resolve(sortRecipes(readRecipes())).then((data) => {
+    return Promise.resolve(loadRecipes()).then((data) => {
       return res.status(200).json(data);
-    });
-  }
-
-  if (req.method === "DELETE") {
-    console.log("🚀 ~ file: recipe.ts ~ line 128 ~ method", req.method);
-
-    if (!req.body) {
-      res.status(400).send("recipe to be deleted required");
-    }
-    const recipe = JSON.parse(req.body);
-
-    deleteRecipe(recipe.id);
-
-    return Promise.resolve().then(() => {
-      return res.status(200).json({});
     });
   }
 
@@ -141,5 +108,38 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     });
   }
 
+  if (req.method === "POST") {
+    if (!req.body) {
+      return res.status(400).send("recipe content required");
+    }
+    if (!req.session?.user?.isLoggedIn) {
+      return res.status(400).send({ message: "log in to add recipe" });
+    }
+    const recipe = JSON.parse(req.body);
+    const newRecipe = { ...recipe, id: uuidv4(), _version: 1 };
+    addRecipe(newRecipe);
+
+    return Promise.resolve(newRecipe).then((data) => {
+      return res.status(200).json(data);
+    });
+  }
+
+  if (req.method === "DELETE") {
+    if (!req.body) {
+      return res.status(400).send("recipe to be deleted required");
+    }
+    console.log("🚀 ~ file: recipe.ts ~ line 137 ~ req.session", req.session);
+    if (!req.session?.user?.isLoggedIn) {
+      return res.status(400).send({ message: "log in to delete recipe" });
+    }
+    const recipe = JSON.parse(req.body);
+
+    deleteRecipe(recipe.id);
+
+    return Promise.resolve().then(() => {
+      return res.status(200).json({});
+    });
+  }
+
   res.status(404).send("Unknown method");
-};
+}

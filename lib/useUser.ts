@@ -34,7 +34,7 @@ export default function useUser({
 const LOGOUT_URL = "/api/logout";
 export async function logout(
   event: React.MouseEvent,
-  mutateUser: KeyedMutator<any>
+  mutateUser: KeyedMutator<User>
 ) {
   try {
     mutateUser(
@@ -52,7 +52,7 @@ export async function logout(
 const LOGIN_URL = "/api/login";
 export async function login(
   event: React.FormEvent<HTMLFormElement>,
-  mutateUser: KeyedMutator<any>,
+  mutateUser: KeyedMutator<User>,
   setErrorMsg?: (msg: string) => void
 ) {
   event.preventDefault();

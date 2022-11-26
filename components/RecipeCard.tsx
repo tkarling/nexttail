@@ -3,10 +3,12 @@ import { Button, Card, Checkbox } from "./Common";
 
 const RecipeCard = ({
   recipe,
+  canEdit,
   toggleThisWeek,
   deleteRecipe,
 }: {
   recipe: Recipe;
+  canEdit: boolean;
   toggleThisWeek: (recipe: Recipe) => void;
   deleteRecipe: (recipe: Recipe) => void;
 }) => {
@@ -29,11 +31,13 @@ const RecipeCard = ({
             </a>
           </div>
         </div>
-        <div className="flex items-center">
-          <Button onClick={() => deleteRecipe(recipe)} color="danger">
-            x
-          </Button>
-        </div>
+        {canEdit && (
+          <div className="flex items-center">
+            <Button onClick={() => deleteRecipe(recipe)} color="danger">
+              x
+            </Button>
+          </div>
+        )}
       </div>
     </Card>
   );

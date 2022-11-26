@@ -1,28 +1,36 @@
-// import { Authenticator } from "@aws-amplify/ui-react";
-import { Page, Card, Spinner, Button } from "../components/Common";
+import { NextApiRequest } from "next";
+import { Card, Spinner, Button } from "../components/Common";
+import { Page } from "../components/Page";
 import { Recipe, RecipeContent } from "../types/index";
 import { loadRecipes as loadFsRecipes } from "./api/recipe";
-// import { loadRecipes } from "./api/grecipe";
+import type { User } from "../pages/api/user";
+
 import AddRecipe from "../components/AddRecipe";
 import RecipeCard from "../components/RecipeCard";
 import useRecipes from "../hooks/useRecipes";
-import { NextApiRequest } from "next";
-import { useState } from "react";
+import useUser from "../lib/useUser";
+import { KeyedMutator, mutate } from "swr";
 
 interface Props {
   recipes: Recipe[];
 }
 
-const RecipePage: React.FC<{ addRecipe?: (recipe: RecipeContent) => void }> = ({
-  children,
-}) => (
-  <Page>
+const RecipePage: React.FC<{
+  addRecipe?: (recipe: RecipeContent) => void;
+  user?: User;
+  mutateUser: KeyedMutator<User>;
+}> = ({ children, user, mutateUser }) => (
+  <Page user={user} mutateUser={mutateUser}>
     <h1 className="text-xl pb-2">Recipes</h1>
     {children}
   </Page>
 );
 
 const Recipes: React.FC<Props> = ({ recipes: initialRecipes = [] }) => {
+  const userProps = useUser();
+  const { user } = userProps;
+  const canEdit = !!user?.isLoggedIn;
+
   const {
     data: recipes = [],
     isLoading,
@@ -31,14 +39,13 @@ const Recipes: React.FC<Props> = ({ recipes: initialRecipes = [] }) => {
     deleteRecipe,
     toggleThisWeek,
   } = useRecipes({ initialRecipes });
-  const [addOpen, setAddOpen] = useState(false);
 
-  if (error) {
-    return <RecipePage>Error: {error}</RecipePage>;
+  if (error && !recipes.length) {
+    return <RecipePage {...userProps}>Error: {error}</RecipePage>;
   }
   if (isLoading) {
     return (
-      <RecipePage>
+      <RecipePage {...userProps}>
         <Spinner />
       </RecipePage>
     );
@@ -46,21 +53,15 @@ const Recipes: React.FC<Props> = ({ recipes: initialRecipes = [] }) => {
 
   return (
     <>
-      {/* {() => ( */}
-      <RecipePage>
-        {addOpen ? (
-          <AddRecipe addRecipe={addRecipe} onClose={() => setAddOpen(false)} />
-        ) : (
-          <div className="py-2">
-            <Button onClick={() => setAddOpen(true)}>Add</Button>
-          </div>
-        )}
+      <RecipePage {...userProps}>
+        {canEdit && <AddRecipe addRecipe={addRecipe} />}
         {recipes.map((recipe) => (
           <RecipeCard
             key={recipe.id}
             recipe={recipe}
             toggleThisWeek={() => toggleThisWeek(recipe)}
             deleteRecipe={() => deleteRecipe(recipe)}
+            canEdit={canEdit}
           />
         ))}
         {!recipes.length && (
@@ -68,8 +69,12 @@ const Recipes: React.FC<Props> = ({ recipes: initialRecipes = [] }) => {
             <div>You have no Recipes. Please add a Recipe</div>
           </Card>
         )}
+        {error && (
+          <Card>
+            <div className="py-2 text-red-500">Error: {error}</div>
+          </Card>
+        )}
       </RecipePage>
-      {/* )} */}
     </>
   );
 };
@@ -77,14 +82,6 @@ const Recipes: React.FC<Props> = ({ recipes: initialRecipes = [] }) => {
 export const getServerSideProps = async ({ req }: { req: NextApiRequest }) => {
   const recipes = loadFsRecipes();
   return { props: { recipes } };
-
-  // try {
-  //   const { recipes = [] } = await loadRecipes({ req });
-  //   return { props: { recipes } };
-  // } catch (error) {
-  //   console.log("Error loading recipes", error);
-  //   return { props: {} };
-  // }
 };
 
 export default Recipes;

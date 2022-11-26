@@ -26,59 +26,64 @@ export default function useRecipes({
   }, []);
 
   return useMemo(() => {
-    const addRecipe = (recipe: RecipeContent) => {
+    const addRecipe = async (recipe: RecipeContent) => {
       setIsLoading(true);
-      fetch(END_POINT, {
-        method: "post",
-        body: JSON.stringify(recipe),
-      })
-        // .then((res) => res.json())
-        .then((data) => {
-          load();
-        })
-        .catch((error) => {
-          console.log("Error adding recipe", recipe.name, error);
-          setError(`Error adding Recipe: ${error}`);
-          setIsLoading(false);
+      try {
+        const response = await fetch(END_POINT, {
+          method: "post",
+          body: JSON.stringify(recipe),
         });
+        if (!response.ok) {
+          throw response;
+        }
+        await load();
+      } catch (response) {
+        const error = await (response as any).json();
+        const message = `Error adding Recipe ${recipe.name}: ${error.message}`;
+        console.log(message);
+        setError(message);
+        setIsLoading(false);
+      }
     };
 
-    const deleteRecipe = (recipe: Recipe) => {
+    const deleteRecipe = async (recipe: Recipe) => {
       setIsLoading(true);
-      return (
-        fetch(END_POINT, {
+      try {
+        const response = await fetch(END_POINT, {
           method: "delete",
           body: JSON.stringify(recipe),
-        })
-          // .then((res) => res.json())
-          .then((data) => {
-            load();
-          })
-          .catch((error) => {
-            console.log("Error deleting recipe", recipe.id, error);
-            setError(`Error deleting Recipe: ${error}`);
-            setIsLoading(false);
-          })
-      );
+        });
+        if (!response.ok) {
+          throw response;
+        }
+        await load();
+      } catch (response) {
+        const error = await (response as any).json();
+        const message = `Error deleting Recipe ${recipe.name}: ${error.message}`;
+        console.log(message);
+        setError(message);
+        setIsLoading(false);
+      }
     };
 
-    const updateRecipe = (recipe: Recipe) => {
+    const updateRecipe = async (recipe: Recipe) => {
       setIsLoading(true);
-      return (
-        fetch(END_POINT, {
+      try {
+        const response = await fetch(END_POINT, {
           method: "put",
           body: JSON.stringify(recipe),
-        })
-          // .then((res) => res.json())
-          .then((data) => {
-            load();
-          })
-          .catch((error) => {
-            console.log("Error updating recipe", recipe.id, error);
-            setError(`Error updating Recipe: ${error}`);
-            setIsLoading(false);
-          })
-      );
+        });
+        if (!response.ok) {
+          throw response;
+        }
+        await load();
+      } catch (response) {
+        const error = await (response as any).json();
+        const message = `Error deleting Recipe ${recipe.name}: ${error.message}`;
+        console.log(message);
+        setError(message);
+        setIsLoading(false);
+      }
     };
 
     const toggleThisWeek = (recipe: Recipe) => {

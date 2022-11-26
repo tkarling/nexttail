@@ -7,7 +7,7 @@ import LoginForm from "../components/LoginForm";
 export default function Login() {
   // here we just check if user is already logged in and redirect to profile
   const { user, mutateUser } = useUser({
-    redirectTo: "/profile-sg",
+    redirectTo: "/recipes",
     redirectIfFound: true,
   });
   const [errorMsg, setErrorMsg] = useState("");
