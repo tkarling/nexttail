@@ -1,7 +1,7 @@
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import Router from "next/router";
-import useSWR from "swr";
-import fetchJson from "../lib/fetchJson";
+import useSWR, { KeyedMutator } from "swr";
+import fetchJson, { FetchError } from "../lib/fetchJson";
 import type { User } from "../pages/api/user";
 
 export default function useUser({
@@ -29,4 +29,51 @@ export default function useUser({
   }, [user, redirectIfFound, redirectTo]);
 
   return { user, mutateUser };
+}
+
+const LOGOUT_URL = "/api/logout";
+export async function logout(
+  event: React.MouseEvent,
+  mutateUser: KeyedMutator<any>
+) {
+  try {
+    mutateUser(
+      await fetchJson(LOGOUT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      }),
+      false
+    );
+  } catch (error) {
+    console.error("An unexpected error happened:", error);
+  }
+}
+
+const LOGIN_URL = "/api/login";
+export async function login(
+  event: React.FormEvent<HTMLFormElement>,
+  mutateUser: KeyedMutator<any>,
+  setErrorMsg?: (msg: string) => void
+) {
+  event.preventDefault();
+
+  const username = event.currentTarget.username.value;
+  const body = username ? { username } : undefined;
+  try {
+    mutateUser(
+      await fetchJson(LOGIN_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: body ? JSON.stringify(body) : undefined,
+      }),
+      false
+    );
+    setErrorMsg?.("");
+  } catch (error) {
+    if (error instanceof FetchError) {
+      setErrorMsg?.(error.data.message);
+    } else {
+      console.error("An unexpected error happened:", error);
+    }
+  }
 }

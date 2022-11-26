@@ -11,7 +11,7 @@ export default function LoginForm({
   return (
     <form onSubmit={onSubmit}>
       <label>
-        <div className="pb-2">Type your GitHub username:</div>
+        <div className="pb-2">Type your username:</div>
         <Input type="text" name="username" required />
       </label>
       <div className="pt-2">

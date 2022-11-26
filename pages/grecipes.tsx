@@ -6,7 +6,8 @@ import { Authenticator } from "@aws-amplify/ui-react";
 import { listRecipeNTS } from "../src/graphql/queries";
 import { createRecipeNT, deleteRecipeNT } from "../src/graphql/mutations";
 
-import { Page, PageTitle, Card, Spinner, Button } from "../components/Common";
+import { PageTitle, Card, Spinner, Button } from "../components/Common";
+import { Page } from "../components/Page";
 import { Recipe, RecipeContent } from "../types/index";
 import AddRecipe from "../components/AddRecipe";
 

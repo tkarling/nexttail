@@ -1,4 +1,4 @@
-import { ButtonHTMLAttributes, InputHTMLAttributes } from "react";
+import type { ButtonHTMLAttributes, InputHTMLAttributes } from "react";
 
 export const bgColor = {
   PRIMARY: "bg-sky-500",
@@ -11,10 +11,6 @@ export const borderColor = {
   SECONDARY: "border-gray-500",
   DANGER: "border-red-500",
 };
-
-export const Page: React.FC = ({ children }) => (
-  <div className="w-full max-w-3xl mx-auto my-6 md:my-16 px-4">{children}</div>
-);
 
 export const PageTitle: React.FC = ({ children }) => <h1>{children}</h1>;
 

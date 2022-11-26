@@ -1,8 +1,8 @@
 import React from "react";
-import { Page } from "../components/Common";
+import { Page } from "../components/Page";
 import { withIronSessionSsr } from "iron-session/next";
 import { sessionOptions } from "../lib/session";
-import { User } from "../pages/api/user";
+import type { User } from "../pages/api/user";
 
 import { InferGetServerSidePropsType } from "next";
 import { ServerResponse } from "http";
@@ -11,7 +11,7 @@ export default function SsrProfile({
   user,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   return (
-    <Page>
+    <Page user={user}>
       <h1>Your GitHub profile</h1>
       <h2>
         This page uses{" "}
@@ -24,18 +24,7 @@ export default function SsrProfile({
         </a>
       </h2>
 
-      {user?.isLoggedIn && (
-        <>
-          <p style={{ fontStyle: "italic" }}>
-            Public data, from{" "}
-            <a href={`https://github.com/${user.login}`}>
-              https://github.com/{user.login}
-            </a>
-            , reduced to `login` and `avatar_url`.
-          </p>
-          <pre>{JSON.stringify(user, null, 2)}</pre>
-        </>
-      )}
+      {user?.isLoggedIn && <pre>{JSON.stringify(user, null, 2)}</pre>}
     </Page>
   );
 }
