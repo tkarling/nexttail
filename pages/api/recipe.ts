@@ -35,7 +35,7 @@ const readRecipes = () => {
     const data = fs.readFileSync(FILE_NAME, { encoding: "utf8", flag: "r" });
     savedRecipes = data ? JSON.parse(data) : [];
   } catch (err) {
-    console.log("Error reading recipes", err);
+    console.error("Error reading recipes", err);
   }
   return savedRecipes;
 };
@@ -45,7 +45,7 @@ const saveRecipes = (recipes: Recipe[]) => {
   try {
     fs.writeFileSync(FILE_NAME, JSON.stringify(recipes));
   } catch (err) {
-    console.log("Error writing recipes", err);
+    console.error("Error writing recipes", err);
   }
 };
 
@@ -128,7 +128,6 @@ async function recipeRoute(req: NextApiRequest, res: NextApiResponse) {
     if (!req.body) {
       return res.status(400).send("recipe to be deleted required");
     }
-    console.log("🚀 ~ file: recipe.ts ~ line 137 ~ req.session", req.session);
     if (!req.session?.user?.isLoggedIn) {
       return res.status(400).send({ message: "log in to delete recipe" });
     }

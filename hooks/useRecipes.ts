@@ -40,7 +40,7 @@ export default function useRecipes({
       } catch (response) {
         const error = await (response as any).json();
         const message = `Error adding Recipe ${recipe.name}: ${error.message}`;
-        console.log(message);
+        console.error(message);
         setError(message);
         setIsLoading(false);
       }
@@ -60,7 +60,7 @@ export default function useRecipes({
       } catch (response) {
         const error = await (response as any).json();
         const message = `Error deleting Recipe ${recipe.name}: ${error.message}`;
-        console.log(message);
+        console.error(message);
         setError(message);
         setIsLoading(false);
       }
@@ -80,7 +80,7 @@ export default function useRecipes({
       } catch (response) {
         const error = await (response as any).json();
         const message = `Error deleting Recipe ${recipe.name}: ${error.message}`;
-        console.log(message);
+        console.error(message);
         setError(message);
         setIsLoading(false);
       }
