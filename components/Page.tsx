@@ -13,7 +13,7 @@ export const Page: React.FC<{
   const isLoginPage = router.pathname === "/login";
   return (
     <div className="w-full max-w-3xl mx-auto my-6 md:my-16 px-4">
-      {!isLoginPage && (
+      {!isLoginPage && user && (
         <header className="flex justify-end">
           {user?.isLoggedIn ? (
             <>

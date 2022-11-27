@@ -34,8 +34,11 @@ const readRecipes = () => {
   try {
     const data = fs.readFileSync(FILE_NAME, { encoding: "utf8", flag: "r" });
     savedRecipes = data ? JSON.parse(data) : [];
-  } catch (err) {
-    console.error("Error reading recipes", err);
+  } catch (err: any) {
+    if (!err?.message?.includes?.("no such file or directory")) {
+      console.error("Error reading recipes", err);
+    }
+    savedRecipes = [];
   }
   return savedRecipes;
 };
