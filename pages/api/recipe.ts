@@ -12,7 +12,7 @@ import { Redis } from "@upstash/redis";
 const redis = new Redis({
   url: process.env.UPSTASH_REDIS_REST_URL,
   token: process.env.UPSTASH_REDIS_REST_TOKEN,
-});
+} as any);
 const KEY = "myRecipes";
 
 const FILE_NAME = "demo.json";
@@ -39,7 +39,7 @@ const readRecipes = async () => {
     return savedRecipes;
   }
   try {
-    const data = await redis.get(KEY);
+    const data: Recipe[] = (await redis.get(KEY)) || [];
     savedRecipes = data || [];
   } catch (err: any) {
     if (!err?.message?.includes?.("no such file or directory")) {
