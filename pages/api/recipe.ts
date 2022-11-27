@@ -1,3 +1,4 @@
+// https://upstash.com/blog/survey-serverless-redis
 import type { NextApiRequest, NextApiResponse } from "next";
 import { withIronSessionApiRoute } from "iron-session/next";
 import { sessionOptions } from "../../lib/session";
@@ -6,7 +7,13 @@ import { v4 as uuidv4 } from "uuid";
 
 import { Recipe } from "../../types";
 
-const fs = require("fs");
+import { Redis } from "@upstash/redis";
+
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN,
+});
+const KEY = "myRecipes";
 
 const FILE_NAME = "demo.json";
 let savedRecipes: Recipe[];
@@ -27,13 +34,13 @@ let savedRecipes: Recipe[];
 //   },
 // ];
 
-const readRecipes = () => {
+const readRecipes = async () => {
   if (savedRecipes) {
     return savedRecipes;
   }
   try {
-    const data = fs.readFileSync(FILE_NAME, { encoding: "utf8", flag: "r" });
-    savedRecipes = data ? JSON.parse(data) : [];
+    const data = await redis.get(KEY);
+    savedRecipes = data || [];
   } catch (err: any) {
     if (!err?.message?.includes?.("no such file or directory")) {
       console.error("Error reading recipes", err);
@@ -46,16 +53,16 @@ const readRecipes = () => {
 const saveRecipes = (recipes: Recipe[]) => {
   savedRecipes = recipes;
   try {
-    fs.writeFileSync(FILE_NAME, JSON.stringify(recipes));
+    redis.set(KEY, JSON.stringify(recipes));
   } catch (err) {
     console.error("Error writing recipes", err);
   }
 };
 
-export const loadRecipes = () => sortRecipes(readRecipes());
+export const loadRecipes = async () => sortRecipes(await readRecipes());
 
-const addRecipe = (newRecipe: Recipe) => {
-  const myRecipes = readRecipes();
+const addRecipe = async (newRecipe: Recipe) => {
+  const myRecipes = await readRecipes();
   const updatedRecipes = [
     ...myRecipes,
     { ...newRecipe, name: newRecipe.name.toLowerCase() },
@@ -63,14 +70,14 @@ const addRecipe = (newRecipe: Recipe) => {
   saveRecipes(updatedRecipes);
 };
 
-const deleteRecipe = (recipeId: string) => {
-  const myRecipes = readRecipes();
+const deleteRecipe = async (recipeId: string) => {
+  const myRecipes = await readRecipes();
   const updatedRecipes = myRecipes.filter((recipe) => recipe.id !== recipeId);
   saveRecipes(updatedRecipes);
 };
 
-const updateRecipe = (newRecipe: Recipe) => {
-  const myRecipes = readRecipes();
+const updateRecipe = async (newRecipe: Recipe) => {
+  const myRecipes = await readRecipes();
   const updatedRecipes = myRecipes.map((recipe) =>
     recipe.id !== newRecipe.id ? recipe : newRecipe
   );
@@ -93,7 +100,7 @@ export default withIronSessionApiRoute(recipeRoute, sessionOptions);
 // eslint-disable-next-line import/no-anonymous-default-export
 async function recipeRoute(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "GET") {
-    return Promise.resolve(loadRecipes()).then((data) => {
+    return loadRecipes().then((data) => {
       return res.status(200).json(data);
     });
   }
@@ -104,9 +111,7 @@ async function recipeRoute(req: NextApiRequest, res: NextApiResponse) {
     }
     const recipe = JSON.parse(req.body);
 
-    updateRecipe(recipe);
-
-    return Promise.resolve().then(() => {
+    return updateRecipe(recipe).then(() => {
       return res.status(200).json(recipe);
     });
   }
@@ -120,10 +125,9 @@ async function recipeRoute(req: NextApiRequest, res: NextApiResponse) {
     }
     const recipe = JSON.parse(req.body);
     const newRecipe = { ...recipe, id: uuidv4(), _version: 1 };
-    addRecipe(newRecipe);
 
-    return Promise.resolve(newRecipe).then((data) => {
-      return res.status(200).json(data);
+    return addRecipe(newRecipe).then(() => {
+      return res.status(200).json(newRecipe);
     });
   }
 
@@ -136,9 +140,7 @@ async function recipeRoute(req: NextApiRequest, res: NextApiResponse) {
     }
     const recipe = JSON.parse(req.body);
 
-    deleteRecipe(recipe.id);
-
-    return Promise.resolve().then(() => {
+    return deleteRecipe(recipe.id).then(() => {
       return res.status(200).json({});
     });
   }

@@ -1,88 +1,48 @@
-import { useState, useCallback, useMemo, useEffect } from "react";
+import { useMemo } from "react";
+import useSWR from "swr";
+import fetchJson from "../lib/fetchJson";
 import { Recipe, RecipeContent } from "../types";
 
 const END_POINT = "api/recipe";
 
 export default function useRecipes() {
-  const [data, setData] = useState<Recipe[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | undefined>(undefined);
-
-  const load = useCallback(() => {
-    fetch(END_POINT)
-      .then((res) => res.json())
-      .then((data) => {
-        setData(data);
-        setIsLoading(false);
-        setError(undefined);
-      })
-      .catch((error) => {
-        setError(`Error loading Recipes: ${error}`);
-      });
-  }, []);
-
-  useEffect(() => {
-    load();
-  }, [load]);
+  const { data, error, mutate } = useSWR<Recipe[]>(END_POINT, fetchJson);
+  const isLoading = !data && !error;
 
   return useMemo(() => {
     const addRecipe = async (recipe: RecipeContent) => {
-      setIsLoading(true);
       try {
-        const response = await fetch(END_POINT, {
+        await fetchJson(END_POINT, {
           method: "post",
           body: JSON.stringify(recipe),
         });
-        if (!response.ok) {
-          throw response;
-        }
-        await load();
-      } catch (response) {
-        const error = await (response as any).json();
-        const message = `Error adding Recipe ${recipe.name}: ${error.message}`;
-        console.error(message);
-        setError(message);
-        setIsLoading(false);
+        mutate();
+      } catch (error) {
+        console.error("An unexpected error happened:", error);
       }
     };
 
     const deleteRecipe = async (recipe: Recipe) => {
-      setIsLoading(true);
       try {
-        const response = await fetch(END_POINT, {
+        await fetchJson(END_POINT, {
           method: "delete",
           body: JSON.stringify(recipe),
         });
-        if (!response.ok) {
-          throw response;
-        }
-        await load();
-      } catch (response) {
-        const error = await (response as any).json();
-        const message = `Error deleting Recipe ${recipe.name}: ${error.message}`;
-        console.error(message);
-        setError(message);
-        setIsLoading(false);
+        mutate();
+      } catch (error) {
+        console.error("An unexpected error happened:", error);
       }
     };
 
     const updateRecipe = async (recipe: Recipe) => {
-      setIsLoading(true);
       try {
-        const response = await fetch(END_POINT, {
+        await fetchJson(END_POINT, {
           method: "put",
           body: JSON.stringify(recipe),
         });
-        if (!response.ok) {
-          throw response;
-        }
-        await load();
-      } catch (response) {
-        const error = await (response as any).json();
-        const message = `Error deleting Recipe ${recipe.name}: ${error.message}`;
-        console.error(message);
-        setError(message);
-        setIsLoading(false);
+        mutate();
+      } catch (error) {
+        console.error("An unexpected error happened:", error);
       }
     };
 
@@ -98,5 +58,5 @@ export default function useRecipes() {
       deleteRecipe,
       toggleThisWeek,
     };
-  }, [data, error, isLoading, load]);
+  }, [data, error, isLoading, mutate]);
 }

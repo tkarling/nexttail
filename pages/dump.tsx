@@ -14,7 +14,7 @@ const Recipes: React.FC<Props> = () => {
     <>
       <Page>
         <h1 className="text-xl pb-2">Recipes</h1>
-        {recipes.length && (
+        {!!recipes.length && (
           <div className="text-sm">
             <pre>{JSON.stringify(recipes, null, 2)}</pre>
           </div>
