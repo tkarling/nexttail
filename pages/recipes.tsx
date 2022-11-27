@@ -1,19 +1,13 @@
-import { NextApiRequest } from "next";
-import { Card, Spinner, Button } from "../components/Common";
+import { KeyedMutator } from "swr";
+import { Card, Spinner } from "../components/Common";
 import { Page } from "../components/Page";
-import { Recipe, RecipeContent } from "../types/index";
-import { loadRecipes as loadFsRecipes } from "./api/recipe";
+import type { RecipeContent } from "../types/index";
 import type { User } from "../pages/api/user";
 
 import AddRecipe from "../components/AddRecipe";
 import RecipeCard from "../components/RecipeCard";
 import useRecipes from "../hooks/useRecipes";
 import useUser from "../lib/useUser";
-import { KeyedMutator, mutate } from "swr";
-
-interface Props {
-  recipes: Recipe[];
-}
 
 const RecipePage: React.FC<{
   addRecipe?: (recipe: RecipeContent) => void;
@@ -26,7 +20,7 @@ const RecipePage: React.FC<{
   </Page>
 );
 
-const Recipes: React.FC<Props> = ({ recipes: initialRecipes = [] }) => {
+const Recipes: React.FC = () => {
   const userProps = useUser();
   const { user } = userProps;
   const canEdit = !!user?.isLoggedIn;
@@ -38,7 +32,7 @@ const Recipes: React.FC<Props> = ({ recipes: initialRecipes = [] }) => {
     addRecipe,
     deleteRecipe,
     toggleThisWeek,
-  } = useRecipes({ initialRecipes });
+  } = useRecipes();
 
   if (error && !recipes.length) {
     return <RecipePage {...userProps}>Error: {error}</RecipePage>;
@@ -77,11 +71,6 @@ const Recipes: React.FC<Props> = ({ recipes: initialRecipes = [] }) => {
       </RecipePage>
     </>
   );
-};
-
-export const getServerSideProps = async ({ req }: { req: NextApiRequest }) => {
-  const recipes = loadFsRecipes();
-  return { props: { recipes } };
 };
 
 export default Recipes;

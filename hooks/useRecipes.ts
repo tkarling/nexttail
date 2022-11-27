@@ -1,14 +1,10 @@
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import { Recipe, RecipeContent } from "../types";
 
 const END_POINT = "api/recipe";
 
-export default function useRecipes({
-  initialRecipes,
-}: {
-  initialRecipes: Recipe[];
-}) {
-  const [data, setData] = useState(() => initialRecipes);
+export default function useRecipes() {
+  const [data, setData] = useState<Recipe[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | undefined>(undefined);
 
@@ -24,6 +20,10 @@ export default function useRecipes({
         setError(`Error loading Recipes: ${error}`);
       });
   }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
 
   return useMemo(() => {
     const addRecipe = async (recipe: RecipeContent) => {

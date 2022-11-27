@@ -9,7 +9,7 @@ import { Recipe } from "../../types";
 const fs = require("fs");
 
 const FILE_NAME = "demo.json";
-let savedRecipes: Recipe[]; //
+let savedRecipes: Recipe[];
 //  = [
 //   {
 //     id: "1",

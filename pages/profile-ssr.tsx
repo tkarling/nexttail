@@ -35,7 +35,7 @@ const gotoLogin = ({ res }: { res: ServerResponse }) => {
   res.end();
   return {
     props: {
-      user: { isLoggedIn: false, login: "", avatarUrl: "" } as User,
+      user: { isLoggedIn: false, login: "" } as User,
     },
   };
 };
