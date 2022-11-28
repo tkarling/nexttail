@@ -6,7 +6,10 @@ import { Recipe, RecipeContent } from "../types";
 const END_POINT = "api/recipe";
 
 export default function useRecipes() {
-  const { data, error, mutate } = useSWR<Recipe[]>(END_POINT, fetchJson);
+  const { data, error, mutate } = useSWR<Recipe[]>(END_POINT, fetchJson, {
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+  });
 
   return useMemo(() => {
     const addRecipe = async (recipe: RecipeContent) => {
@@ -15,7 +18,8 @@ export default function useRecipes() {
           await fetchJson(END_POINT, {
             method: "post",
             body: JSON.stringify(recipe),
-          })
+          }),
+          { revalidate: false }
         );
       } catch (error) {
         console.error("An unexpected error happened:", error);
@@ -28,7 +32,8 @@ export default function useRecipes() {
           await fetchJson(END_POINT, {
             method: "delete",
             body: JSON.stringify(recipe),
-          })
+          }),
+          { revalidate: false }
         );
       } catch (error) {
         console.error("An unexpected error happened:", error);
@@ -41,7 +46,8 @@ export default function useRecipes() {
           await fetchJson(END_POINT, {
             method: "put",
             body: JSON.stringify(recipe),
-          })
+          }),
+          { revalidate: false }
         );
       } catch (error) {
         console.error("An unexpected error happened:", error);

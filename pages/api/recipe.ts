@@ -46,12 +46,14 @@ const readRecipes = async () => {
   }
 };
 
-const saveRecipes = (recipes: Recipe[]) => {
+const saveRecipes = (mrecipes: Recipe[]) => {
+  const recipes = sortRecipes(mrecipes);
   try {
     redis.set(KEY, JSON.stringify(recipes));
   } catch (err) {
     console.error("Error writing recipes", err);
   }
+  return recipes;
 };
 
 export const loadRecipes = async () => sortRecipes(await readRecipes());
@@ -60,17 +62,15 @@ const addRecipe = async (newRecipe: Recipe) => {
   const myRecipes = await readRecipes();
   const updatedRecipes = [
     ...myRecipes,
-    { ...newRecipe, name: newRecipe.name.toLowerCase() },
+    { ...newRecipe, name: newRecipe.name.toLowerCase(), thisWeek: true },
   ];
-  await saveRecipes(updatedRecipes);
-  return updatedRecipes;
+  return await saveRecipes(updatedRecipes);
 };
 
 const deleteRecipe = async (recipeId: string) => {
   const myRecipes = await readRecipes();
   const updatedRecipes = myRecipes.filter((recipe) => recipe.id !== recipeId);
-  await saveRecipes(updatedRecipes);
-  return updatedRecipes;
+  return await saveRecipes(updatedRecipes);
 };
 
 const updateRecipe = async (newRecipe: Recipe) => {
@@ -78,8 +78,7 @@ const updateRecipe = async (newRecipe: Recipe) => {
   const updatedRecipes = myRecipes.map((recipe) =>
     recipe.id !== newRecipe.id ? recipe : newRecipe
   );
-  await saveRecipes(updatedRecipes);
-  return updatedRecipes;
+  return await saveRecipes(updatedRecipes);
 };
 
 const sortRecipes = (recipes: Recipe[]) =>

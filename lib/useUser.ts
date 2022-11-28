@@ -10,7 +10,11 @@ export default function useUser({
 } = {}) {
   const { data: user, mutate: mutateUser } = useSWR<User>(
     "/api/user",
-    fetchJson
+    fetchJson,
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+    }
   );
 
   useEffect(() => {
