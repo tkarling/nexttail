@@ -16,7 +16,7 @@ const redis = new Redis({
 const KEY = "myRecipes";
 
 const FILE_NAME = "demo.json";
-let savedRecipes: Recipe[];
+// let savedRecipes: Recipe[];
 //  = [
 //   {
 //     id: "1",
@@ -35,23 +35,18 @@ let savedRecipes: Recipe[];
 // ];
 
 const readRecipes = async () => {
-  if (savedRecipes) {
-    return savedRecipes;
-  }
   try {
     const data: Recipe[] = (await redis.get(KEY)) || [];
-    savedRecipes = data || [];
+    return data || [];
   } catch (err: any) {
     if (!err?.message?.includes?.("no such file or directory")) {
       console.error("Error reading recipes", err);
     }
-    savedRecipes = [];
+    return [];
   }
-  return savedRecipes;
 };
 
 const saveRecipes = (recipes: Recipe[]) => {
-  savedRecipes = recipes;
   try {
     redis.set(KEY, JSON.stringify(recipes));
   } catch (err) {
@@ -67,13 +62,15 @@ const addRecipe = async (newRecipe: Recipe) => {
     ...myRecipes,
     { ...newRecipe, name: newRecipe.name.toLowerCase() },
   ];
-  saveRecipes(updatedRecipes);
+  await saveRecipes(updatedRecipes);
+  return updatedRecipes;
 };
 
 const deleteRecipe = async (recipeId: string) => {
   const myRecipes = await readRecipes();
   const updatedRecipes = myRecipes.filter((recipe) => recipe.id !== recipeId);
-  saveRecipes(updatedRecipes);
+  await saveRecipes(updatedRecipes);
+  return updatedRecipes;
 };
 
 const updateRecipe = async (newRecipe: Recipe) => {
@@ -81,7 +78,8 @@ const updateRecipe = async (newRecipe: Recipe) => {
   const updatedRecipes = myRecipes.map((recipe) =>
     recipe.id !== newRecipe.id ? recipe : newRecipe
   );
-  saveRecipes(updatedRecipes);
+  await saveRecipes(updatedRecipes);
+  return updatedRecipes;
 };
 
 const sortRecipes = (recipes: Recipe[]) =>
@@ -111,8 +109,8 @@ async function recipeRoute(req: NextApiRequest, res: NextApiResponse) {
     }
     const recipe = JSON.parse(req.body);
 
-    return updateRecipe(recipe).then(() => {
-      return res.status(200).json(recipe);
+    return updateRecipe(recipe).then((data) => {
+      return res.status(200).json(data);
     });
   }
 
@@ -126,8 +124,8 @@ async function recipeRoute(req: NextApiRequest, res: NextApiResponse) {
     const recipe = JSON.parse(req.body);
     const newRecipe = { ...recipe, id: uuidv4(), _version: 1 };
 
-    return addRecipe(newRecipe).then(() => {
-      return res.status(200).json(newRecipe);
+    return addRecipe(newRecipe).then((data) => {
+      return res.status(200).json(data);
     });
   }
 
@@ -140,8 +138,8 @@ async function recipeRoute(req: NextApiRequest, res: NextApiResponse) {
     }
     const recipe = JSON.parse(req.body);
 
-    return deleteRecipe(recipe.id).then(() => {
-      return res.status(200).json({});
+    return deleteRecipe(recipe.id).then((data) => {
+      return res.status(200).json(data);
     });
   }
 

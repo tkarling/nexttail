@@ -26,51 +26,52 @@ const Recipes: React.FC = () => {
   const canEdit = !!user?.isLoggedIn;
 
   const {
-    data: recipes = [],
-    isLoading,
+    data: recipes,
     error,
     addRecipe,
     deleteRecipe,
     toggleThisWeek,
   } = useRecipes();
 
-  if (error && !recipes.length) {
+  if (error && !recipes?.length) {
     return <RecipePage {...userProps}>Error: {error}</RecipePage>;
   }
-  if (isLoading) {
+  if (!recipes && !error) {
     return (
       <RecipePage {...userProps}>
         <Spinner />
       </RecipePage>
     );
   }
-
-  return (
-    <>
-      <RecipePage {...userProps}>
-        {canEdit && <AddRecipe addRecipe={addRecipe} />}
-        {recipes.map((recipe) => (
-          <RecipeCard
-            key={recipe.id}
-            recipe={recipe}
-            toggleThisWeek={() => toggleThisWeek(recipe)}
-            deleteRecipe={() => deleteRecipe(recipe)}
-            canEdit={canEdit}
-          />
-        ))}
-        {!recipes.length && (
-          <Card>
-            <div>You have no Recipes. Please add a Recipe</div>
-          </Card>
-        )}
-        {error && (
-          <Card>
-            <div className="py-2 text-red-500">Error: {error}</div>
-          </Card>
-        )}
-      </RecipePage>
-    </>
-  );
+  if (recipes) {
+    return (
+      <>
+        <RecipePage {...userProps}>
+          {canEdit && <AddRecipe addRecipe={addRecipe} />}
+          {recipes.map((recipe) => (
+            <RecipeCard
+              key={recipe.id}
+              recipe={recipe}
+              toggleThisWeek={() => toggleThisWeek(recipe)}
+              deleteRecipe={() => deleteRecipe(recipe)}
+              canEdit={canEdit}
+            />
+          ))}
+          {!recipes.length && (
+            <Card>
+              <div>You have no Recipes. Please add a Recipe</div>
+            </Card>
+          )}
+          {error && (
+            <Card>
+              <div className="py-2 text-red-500">Error: {error}</div>
+            </Card>
+          )}
+        </RecipePage>
+      </>
+    );
+  }
+  return null;
 };
 
 export default Recipes;

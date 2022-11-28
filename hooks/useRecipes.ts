@@ -7,16 +7,16 @@ const END_POINT = "api/recipe";
 
 export default function useRecipes() {
   const { data, error, mutate } = useSWR<Recipe[]>(END_POINT, fetchJson);
-  const isLoading = !data && !error;
 
   return useMemo(() => {
     const addRecipe = async (recipe: RecipeContent) => {
       try {
-        await fetchJson(END_POINT, {
-          method: "post",
-          body: JSON.stringify(recipe),
-        });
-        mutate();
+        mutate(
+          await fetchJson(END_POINT, {
+            method: "post",
+            body: JSON.stringify(recipe),
+          })
+        );
       } catch (error) {
         console.error("An unexpected error happened:", error);
       }
@@ -24,11 +24,12 @@ export default function useRecipes() {
 
     const deleteRecipe = async (recipe: Recipe) => {
       try {
-        await fetchJson(END_POINT, {
-          method: "delete",
-          body: JSON.stringify(recipe),
-        });
-        mutate();
+        mutate(
+          await fetchJson(END_POINT, {
+            method: "delete",
+            body: JSON.stringify(recipe),
+          })
+        );
       } catch (error) {
         console.error("An unexpected error happened:", error);
       }
@@ -36,11 +37,12 @@ export default function useRecipes() {
 
     const updateRecipe = async (recipe: Recipe) => {
       try {
-        await fetchJson(END_POINT, {
-          method: "put",
-          body: JSON.stringify(recipe),
-        });
-        mutate();
+        mutate(
+          await fetchJson(END_POINT, {
+            method: "put",
+            body: JSON.stringify(recipe),
+          })
+        );
       } catch (error) {
         console.error("An unexpected error happened:", error);
       }
@@ -52,11 +54,10 @@ export default function useRecipes() {
 
     return {
       data,
-      isLoading,
       error,
       addRecipe,
       deleteRecipe,
       toggleThisWeek,
     };
-  }, [data, error, isLoading, mutate]);
+  }, [data, error, mutate]);
 }
